@@ -148,19 +148,63 @@ body {
 }
 
 .editor {
-    min-height: 100px;
-    padding: 12px;
+    min-height: 120px; /* Increased from 100px */
+    max-height: 300px; /* Add max height with scrolling */
+    padding: 12px 16px; /* Increased left/right padding */
     border: none;
     outline: none;
     font-family: inherit;
     font-size: 14px;
     line-height: 1.5;
     resize: vertical;
+    overflow-y: auto; /* Add scrolling for long content */
+    word-wrap: break-word;
 }
 
 .editor:empty:before {
     content: attr(data-placeholder);
     color: #adb5bd;
+}
+
+/* Fix list indentation and spacing */
+.editor ul, .editor ol {
+    margin: 8px 0;
+    padding-left: 24px; /* Proper bullet indentation */
+}
+
+.editor li {
+    margin: 4px 0;
+    padding-left: 4px; /* Small additional space after bullet */
+}
+
+/* Nested lists */
+.editor ul ul, .editor ol ol, .editor ul ol, .editor ol ul {
+    margin: 4px 0;
+    padding-left: 20px;
+}
+
+/* Prevent content from getting too close to container edge */
+.editor p {
+    margin: 4px 0;
+}
+
+/* Scrollbar styling for better UX */
+.editor::-webkit-scrollbar {
+    width: 6px;
+}
+
+.editor::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.editor::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .form-actions {
