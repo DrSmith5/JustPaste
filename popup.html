@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Expander</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ Keyword Expander</h1>
+        <p>Manage your text shortcuts</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats" id="stats">
+            0 keywords saved
+        </div>
+        
+        <button class="add-keyword" id="addBtn">
+            + Add New Keyword
+        </button>
+        
+        <div class="keyword-form" id="keywordForm">
+            <div class="form-group">
+                <label for="trigger">Trigger Keyword</label>
+                <input type="text" id="trigger" placeholder="e.g., addr, sig, email">
+            </div>
+            
+            <div class="form-group">
+                <label for="expansion">Expansion Text</label>
+                <div class="editor-container">
+                    <div class="editor-toolbar">
+                        <button class="editor-btn" data-cmd="bold">B</button>
+                        <button class="editor-btn" data-cmd="italic">I</button>
+                        <button class="editor-btn" data-cmd="underline">U</button>
+                        <button class="editor-btn" data-cmd="insertUnorderedList">• List</button>
+                        <button class="editor-btn" data-cmd="insertOrderedList">1. List</button>
+                    </div>
+                    <div class="editor" id="editor" contenteditable="true" data-placeholder="Enter your text expansion here..."></div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" id="saveBtn">Save Keyword</button>
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
+        
+        <input type="text" class="search-box hidden" id="searchBox" placeholder="🔍 Search keywords...">
+        
+        <div class="keywords-list" id="keywordsList">
+            <div class="empty-state">
+                <div style="font-size: 48px; margin-bottom: 15px;">📝</div>
+                <h3>No keywords yet</h3>
+                <p>Create your first keyword shortcut to get started!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
