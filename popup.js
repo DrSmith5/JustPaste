@@ -28,13 +28,25 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     saveKeyword();
 });
 
-// Editor toolbar buttons
+// Enhanced toolbar button handling
 document.querySelectorAll('.editor-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         const cmd = btn.dataset.cmd;
-        document.execCommand(cmd, false, null);
-        btn.classList.toggle('active');
+        
+        // Special handling for list commands
+        if (cmd === 'insertUnorderedList' || cmd === 'insertOrderedList') {
+            document.execCommand(cmd, false, null);
+            // Ensure the button state reflects the current selection
+            setTimeout(() => {
+                const isActive = document.queryCommandState(cmd);
+                btn.classList.toggle('active', isActive);
+            }, 10);
+        } else {
+            document.execCommand(cmd, false, null);
+            btn.classList.toggle('active', document.queryCommandState(cmd));
+        }
+        
         document.getElementById('editor').focus();
     });
 });
@@ -76,9 +88,21 @@ function hideForm() {
     editingId = null;
 }
 
+// Enhanced save function that properly preserves HTML formatting
 function saveKeyword() {
     const trigger = document.getElementById('trigger').value.trim();
-    const expansion = document.getElementById('editor').innerHTML.trim();
+    const editor = document.getElementById('editor');
+    
+    // Get HTML content directly, don't convert to text
+    let expansion = editor.innerHTML.trim();
+    
+    // Clean up the HTML but preserve essential formatting
+    expansion = expansion
+        .replace(/<div><br><\/div>/g, '<br>') // Clean up empty divs
+        .replace(/<div>/g, '<br>') // Convert divs to line breaks
+        .replace(/<\/div>/g, '') // Remove closing divs
+        .replace(/^<br>/, '') // Remove leading breaks
+        .replace(/<br>$/, ''); // Remove trailing breaks
     
     if (!trigger || !expansion) {
         alert('Please fill in both trigger and expansion fields.');
@@ -86,20 +110,78 @@ function saveKeyword() {
     }
 
     const id = editingId || Date.now().toString();
+    const now = Date.now();
+    
+    // Handle creation vs update properly
+    const existingKeyword = editingId ? keywords[id] : null;
+    
     keywords[id] = {
         id,
         trigger: trigger.toLowerCase(),
-        expansion,
-        created: editingId ? keywords[id].created : Date.now(),
-        updated: Date.now()
+        expansion, // Store raw HTML
+        created: existingKeyword ? existingKeyword.created : now,
+        updated: now
     };
 
     chrome.storage.sync.set({ keywords }, () => {
+        console.log('Keywords saved:', keywords); // Debug log
         renderKeywords();
         updateStats();
         hideForm();
     });
 }
+
+// Update the editor to handle paste events properly
+document.addEventListener('DOMContentLoaded', function() {
+    const editor = document.getElementById('editor');
+    
+    // Handle paste to preserve formatting
+    editor.addEventListener('paste', function(e) {
+        e.preventDefault();
+        
+        // Get pasted content
+        const paste = (e.clipboardData || window.clipboardData).getData('text/html') || 
+                     (e.clipboardData || window.clipboardData).getData('text/plain');
+        
+        // Insert at cursor position
+        document.execCommand('insertHTML', false, paste);
+    });
+    
+    // Prevent the editor from losing formatting on blur/focus
+    editor.addEventListener('blur', function() {
+        // Store current content to prevent loss
+        this.dataset.lastContent = this.innerHTML;
+    });
+    
+    editor.addEventListener('focus', function() {
+        // Restore content if it was somehow lost
+        if (this.innerHTML === '' && this.dataset.lastContent) {
+            this.innerHTML = this.dataset.lastContent;
+        }
+    });
+
+    // Add horizontal scroll handling
+    editor.addEventListener('keydown', function(e) {
+        // Enable horizontal scrolling with arrow keys when text is wide
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                setTimeout(() => {
+                    // Scroll the element horizontally to keep cursor visible
+                    const rect = range.getBoundingClientRect();
+                    const editorRect = editor.getBoundingClientRect();
+                    
+                    if (rect.left < editorRect.left) {
+                        editor.scrollLeft -= (editorRect.left - rect.left + 20);
+                    } else if (rect.right > editorRect.right) {
+                        editor.scrollLeft += (rect.right - editorRect.right + 20);
+                    }
+                }, 0);
+            }
+        }
+    });
+});
 
 function deleteKeyword(id) {
     if (confirm('Are you sure you want to delete this keyword?')) {
