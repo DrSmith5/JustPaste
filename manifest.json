@@ -17,5 +17,10 @@
     "action": {
       "default_popup": "popup.html",
       "default_title": "JustPaste"
+    },
+    "icons": {
+    "16": "icons/JustPaste_icon16.png",
+    "48": "icons/JustPaste_icon48.png",
+    "128": "icons/JustPaste_icon128.png"
     }
   }
