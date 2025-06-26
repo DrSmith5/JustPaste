@@ -141,6 +141,17 @@ function saveKeyword() {
         return;
     }
 
+    // Check for too many duplicates
+    const duplicateCount = Object.values(keywords).filter(k => 
+        k.trigger === trigger.toLowerCase()
+    ).length;
+
+    if (duplicateCount >= 3 && !editingId) {
+        errorText.textContent = 'Maximum 3 matching keywords allowed.';
+        errorBar.classList.remove('hidden');
+        return;
+    }
+
     keywords[id] = {
         id,
         trigger: trigger.toLowerCase(),
