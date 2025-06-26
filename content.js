@@ -422,7 +422,7 @@ function processInput(event) {
     
     const wordInfo = getCurrentWord(element);
     
-    if (!wordInfo || wordInfo.word.length < 2) return;
+    if (!wordInfo || wordInfo.word.length < 1) return;
     
     // Check for matching keywords
     const matchingKeywords = Object.values(keywords).filter(k => 

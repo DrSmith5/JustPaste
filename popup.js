@@ -128,6 +128,19 @@ function saveKeyword() {
     const now = Date.now();
     const existingKeyword = editingId ? keywords[id] : null;
 
+    // Check for duplicate trigger with same content
+    const duplicateKeyword = Object.values(keywords).find(k => 
+        k.id !== id && 
+        k.trigger === trigger.toLowerCase() && 
+        k.expansion === expansion
+    );
+
+    if (duplicateKeyword) {
+        errorText.textContent = 'This keyword already exists with the same content.';
+        errorBar.classList.remove('hidden');
+        return;
+    }
+
     keywords[id] = {
         id,
         trigger: trigger.toLowerCase(),
