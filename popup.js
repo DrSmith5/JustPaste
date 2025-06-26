@@ -33,23 +33,20 @@ document.querySelectorAll('.editor-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         const cmd = btn.dataset.cmd;
-        
-        // Special handling for list commands
-        if (cmd === 'insertUnorderedList' || cmd === 'insertOrderedList') {
-            document.execCommand(cmd, false, null);
-            // Ensure the button state reflects the current selection
-            setTimeout(() => {
-                const isActive = document.queryCommandState(cmd);
-                btn.classList.toggle('active', isActive);
-            }, 10);
-        } else {
-            document.execCommand(cmd, false, null);
+        document.execCommand(cmd, false, null);
+
+        // Toggle 'active' only for text formatting (not list buttons)
+        const toggleable = ['bold', 'italic', 'underline'];
+        if (toggleable.includes(cmd)) {
             btn.classList.toggle('active', document.queryCommandState(cmd));
+        } else {
+            btn.classList.remove('active');
         }
-        
+
         document.getElementById('editor').focus();
     });
 });
+
 
 // Search functionality
 document.getElementById('searchBox').addEventListener('input', (e) => {
@@ -64,17 +61,22 @@ function showForm(keyword = null) {
     form.classList.add('show');
     addBtn.textContent = keyword ? 'Cancel Edit' : 'Cancel';
     
+    const editorEl = document.getElementById('editor');
+
     if (keyword) {
         editingId = keyword.id;
         document.getElementById('trigger').value = keyword.trigger;
-        document.getElementById('editor').innerHTML = keyword.expansion;
+        editorEl.innerHTML = keyword.expansion;
+        editorEl.dataset.lastContent = keyword.expansion; // ensure it doesn't restore old content on blur
         document.getElementById('saveBtn').textContent = 'Update Keyword';
     } else {
         editingId = null;
         document.getElementById('trigger').value = '';
-        document.getElementById('editor').innerHTML = '';
+        editorEl.innerHTML = '';
+        editorEl.dataset.lastContent = ''; // prevent re-inserting old data
         document.getElementById('saveBtn').textContent = 'Save Keyword';
     }
+
     
     document.getElementById('trigger').focus();
 }
@@ -184,14 +186,37 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function deleteKeyword(id) {
-    if (confirm('Are you sure you want to delete this keyword?')) {
+    const keywordEl = document.querySelector(`.action-btn.delete[data-id="${id}"]`).closest('.keyword-item');
+
+    // Prevent duplicates
+    if (keywordEl.querySelector('.confirm-delete')) return;
+
+    // Create confirm bar
+    const confirmBar = document.createElement('div');
+    confirmBar.className = 'confirm-delete';
+    confirmBar.innerHTML = `
+        <span class="confirm-text">Delete this keyword?</span>
+        <div class="confirm-actions">
+            <button class="btn-confirm">Yes</button>
+            <button class="btn-cancel">No</button>
+        </div>
+    `;
+
+    keywordEl.appendChild(confirmBar);
+
+    confirmBar.querySelector('.btn-confirm').addEventListener('click', () => {
         delete keywords[id];
         chrome.storage.sync.set({ keywords }, () => {
             renderKeywords();
             updateStats();
         });
-    }
+    });
+
+    confirmBar.querySelector('.btn-cancel').addEventListener('click', () => {
+        confirmBar.remove();
+    });
 }
+
 
 function editKeyword(id) {
     const keyword = keywords[id];
