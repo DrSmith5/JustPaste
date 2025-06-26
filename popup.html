@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarSnips</title>
+    <title>JustPaste</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -20,7 +20,12 @@
         <button class="add-keyword" id="addBtn">
             + Add New Keyword
         </button>
-        
+
+        <div class="form-error-bar hidden" id="formErrorBar">
+        <span id="formErrorText">Error message</span>
+        <button class="form-error-close" id="formErrorClose">✖</button>
+        </div>
+
         <div class="keyword-form" id="keywordForm">
             <div class="form-group">
                 <label for="trigger">Trigger Keyword</label>

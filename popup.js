@@ -1,5 +1,13 @@
 let editingId = null;
 let keywords = {};
+const errorBar = document.getElementById('formErrorBar');
+const errorText = document.getElementById('formErrorText');
+const errorClose = document.getElementById('formErrorClose');
+
+errorClose.addEventListener('click', () => {
+  errorBar.classList.add('hidden');
+});
+
 
 // Load keywords on startup
 chrome.storage.sync.get(['keywords'], (result) => {
@@ -20,6 +28,7 @@ document.getElementById('addBtn').addEventListener('click', () => {
 
 // Cancel button
 document.getElementById('cancelBtn').addEventListener('click', () => {
+    errorBar.classList.add('hidden');
     hideForm();
 });
 
@@ -94,44 +103,47 @@ function hideForm() {
 function saveKeyword() {
     const trigger = document.getElementById('trigger').value.trim();
     const editor = document.getElementById('editor');
-    
-    // Get HTML content directly, don't convert to text
     let expansion = editor.innerHTML.trim();
-    
-    // Clean up the HTML but preserve essential formatting
+
+    // Clean up expansion
     expansion = expansion
-        .replace(/<div><br><\/div>/g, '<br>') // Clean up empty divs
-        .replace(/<div>/g, '<br>') // Convert divs to line breaks
-        .replace(/<\/div>/g, '') // Remove closing divs
-        .replace(/^<br>/, '') // Remove leading breaks
-        .replace(/<br>$/, ''); // Remove trailing breaks
-    
-    if (!trigger || !expansion) {
-        alert('Please fill in both trigger and expansion fields.');
+        .replace(/<div><br><\/div>/g, '<br>')
+        .replace(/<div>/g, '<br>')
+        .replace(/<\/div>/g, '')
+        .replace(/^<br>/, '')
+        .replace(/<br>$/, '');
+
+    // Hide error if shown
+    errorBar.classList.add('hidden');
+
+    if (!trigger || !expansion) return;
+
+    if (trigger.includes(' ')) {
+        errorText.textContent = 'Spaces are not allowed in the keyword.';
+        errorBar.classList.remove('hidden');
         return;
     }
 
     const id = editingId || Date.now().toString();
     const now = Date.now();
-    
-    // Handle creation vs update properly
     const existingKeyword = editingId ? keywords[id] : null;
-    
+
     keywords[id] = {
         id,
         trigger: trigger.toLowerCase(),
-        expansion, // Store raw HTML
+        expansion,
         created: existingKeyword ? existingKeyword.created : now,
         updated: now
     };
 
     chrome.storage.sync.set({ keywords }, () => {
-        console.log('Keywords saved:', keywords); // Debug log
         renderKeywords();
         updateStats();
         hideForm();
+        errorBar.classList.add('hidden'); // clear on success
     });
 }
+
 
 // Update the editor to handle paste events properly
 document.addEventListener('DOMContentLoaded', function() {

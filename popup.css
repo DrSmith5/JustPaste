@@ -420,3 +420,31 @@ body {
     color: #495057;
     text-align: center;
 }
+
+.form-error-bar {
+  background-color: #ff4d4f;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.form-error-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+}
+
+.hidden {
+  display: none;
+}
