@@ -365,7 +365,7 @@ function positionPopup(popup, element, wordInfo) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
-        if (!wordInfo || !wordInfo.word) return;
+        if (!selection.rangeCount || !wordInfo || !wordInfo.word) return;
 
         const range = selection.getRangeAt(0).cloneRange();
         range.setStart(range.endContainer, range.endOffset - wordInfo.word.length);
