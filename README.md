@@ -1,39 +1,67 @@
-# StarSnips
+# JustPaste
 
-StarSnips is a Chrome extension that expands predefined keywords into formatted text snippets. It streamlines repetitive typing by letting you create and manage keyword-based shortcuts directly from the extension popup.
-
----
+JustPaste is a lightweight, customizable Chrome extension that lets you define text expansion shortcuts for commonly used phrases. Simply assign a keyword to a block of formatted text, and paste it instantly by typing the keyword in any input field.
 
 ## Features
 
-- Define custom keywords and their rich-text expansions
-- Works in most textboxes, including single-line, multi-line, and editable fields
-- Displays an inline popup with matching expansions as you type
-- Replaces the keyword with the corresponding snippet on click
-- Preserves formatting (bold, italic, lists, etc.)
-- Stores data in Chrome Sync so your snippets persist across devices
+- Create reusable text snippets with bold, italic, underline, and list formatting
+- Save shortcuts using keywords (e.g., `addr`, `sig`, `email`)
+- Instant keyword expansion into rich text fields
+- Works across most websites and input types
+- Intuitive UI for adding, editing, and deleting snippets
+- Smart error handling for duplicates, empty entries, and invalid input
+
+- > ⚠️ **Note**: JustPaste works with most standard text inputs and editable areas, but may not function on some complex editors like Google Docs or proprietary in-browser editors.
+
+## Manual Installation (Before Chrome Store Release)
+
+To install JustPaste manually:
+
+1. **Download or clone this repo**
+
+2. **Extract the Folder**  
+   Unzip the downloaded archive if necessary.
+
+3. **Open Chrome Extensions Page**  
+   Navigate to: `chrome://extensions/`
+
+4. **Enable Developer Mode**  
+   Toggle the switch in the top-right corner.
+
+5. **Load the Extension**  
+   Click **Load unpacked** and select the JustPaste folder.
+
+JustPaste is now installed and ready to use!
+
+## How To Use
+*I recommend pinning the JustPaste extension*
+
+**Adding Keyword**
+1. Click "Add New Keyword"
+2. Add a keyword (trigger word)
+3. Add text you want to paste when keyword is typed
+4. Click "Save Keyword"
+5. When the keyword is typed, a popup will show with a snippet of the pasteable text
+6. Click the popup to paste the text
+
+**Edit Keyword**
+1. Click the "pencil" icon
+2. Make any edit to the keyword
+3. Click "Update Keyword"
+
+**Delete Keyword**
+1. Click the "trash" icon
+2. A delete confirmation will popup
+3. Click "yes"
+4. The keyword is now deleted
+
+- > ⚠️ **Note**: You can only save up to **three** keywords with the same trigger word and different paste contents, and keywords **cannot** contain spaces.
+
+## Coming Soon
+
+- Chrome Web Store release  
+- More features and improvements
 
 ---
 
-## How to Install
-
-1. Download or clone this repository
-2. Open Google Chrome and go to `chrome://extensions`
-3. Enable **Developer mode** in the top right
-4. Click **Load unpacked**
-5. Select the project directory
-
----
-
-## How to Use
-
-1. Click the StarSnips icon in your Chrome toolbar
-2. Add a new keyword and its expansion text using the form
-3. Type that keyword into a supported textbox on any website
-4. A popup will appear above the word—click it to insert the full snippet
-
----
-
-## Compatibility
-
-StarSnips is designed to work with standard input fields, textareas, and many content-editable elements. Support for more complex editors is planned in future updates.
+Made with care by Devin
