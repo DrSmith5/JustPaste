@@ -360,45 +360,6 @@ function expandKeyword(element, expansion, wordInfo) {
     }
 }
 
-// Position popup
-function positionPopup(popup, element, wordInfo) {
-    let rect;
-
-    if (element.contentEditable === 'true' || element.isContentEditable) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        if (!selection.rangeCount || !wordInfo || !wordInfo.word) return;
-
-        const range = selection.getRangeAt(0).cloneRange();
-        range.setStart(range.endContainer, range.endOffset - wordInfo.word.length);
-        range.setEnd(range.endContainer, range.endOffset);
-
-        rect = range.getBoundingClientRect();
-    } else {
-        // Fallback to element box for inputs
-        rect = element.getBoundingClientRect();
-    }
-
-    // Get popup dimensions
-    popup.style.visibility = 'hidden';
-    popup.style.display = 'block';
-    const popupRect = popup.getBoundingClientRect();
-    popup.style.visibility = 'visible';
-
-    let top = rect.top - popupRect.height - 8;
-    if (top < 0) top = rect.bottom + 8;
-
-    let left = rect.left;
-    if (left + popupRect.width > window.innerWidth) {
-        left = window.innerWidth - popupRect.width - 10;
-    }
-    if (left < 10) left = 10;
-
-    popup.style.left = `${left}px`;
-    popup.style.top = `${top}px`;
-}
-
 
 // Enhanced input handler with debouncing
 let inputTimeout = null;
@@ -481,7 +442,6 @@ function processInput(event) {
         currentPopup.appendChild(item);
     });
     
-    positionPopup(currentPopup, element, wordInfo);
     showPopup(currentPopup);
 }
 
@@ -543,19 +503,6 @@ function initialize() {
     // Add event listeners
     document.addEventListener('click', handleClickOutside, true);
     document.addEventListener('keydown', handleKeyDown, true);
-    
-    // Handle window events
-    window.addEventListener('resize', () => {
-        if (currentPopup && currentTarget) {
-            positionPopup(currentPopup, currentTarget);
-        }
-    });
-    
-    window.addEventListener('scroll', () => {
-        if (currentPopup && currentTarget) {
-            positionPopup(currentPopup, currentTarget);
-        }
-    }, true);
     
     // Attach to existing elements
     const existingInputs = document.querySelectorAll('input, textarea, [contenteditable], [role="textbox"]');
