@@ -115,19 +115,22 @@ function hidePopup(popup) {
 // Enhanced text extraction that works with various editors
 function getElementText(element) {
     // For standard inputs
-    if (element.value !== undefined) {
+   if (element.value !== undefined) {
         return element.value;
     }
-    
-    // For contentEditable - try different methods
-    if (element.textContent !== undefined) {
-        return element.textContent;
+
+    if (element.innerHTML !== undefined) {
+        // Replace <div>, <p>, and <br> with newlines
+        let html = element.innerHTML
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<\/div>|<\/p>/gi, '\n');
+
+        // Strip tags and decode HTML
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        return temp.textContent || temp.innerText || '';
     }
-    
-    if (element.innerText !== undefined) {
-        return element.innerText;
-    }
-    
+
     return '';
 }
 
