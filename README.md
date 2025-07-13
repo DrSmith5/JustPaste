@@ -2,6 +2,9 @@
 
 JustPaste is a lightweight, customizable Chrome extension that lets you define text expansion shortcuts for commonly used phrases. Simply assign a keyword to a block of formatted text, and paste it instantly by typing the keyword in any input field.
 
+## Download on the Chrome Store!
+[Check out the Chrome Extension](https://chromewebstore.google.com/detail/dhokfeiamfnbhnmhhjaghheekhmdakoi?utm_source=item-share-cb)
+
 ## Features
 
 - Create reusable text snippets with bold, italic, underline, and list formatting
