@@ -1,5 +1,6 @@
 // Enhanced content script for keyword expansion - works with ticketing systems
 let keywords = {};
+let keywordMap = new Map();
 let currentPopup = null;
 let currentTarget = null;
 let isExpanding = false;
@@ -7,13 +8,23 @@ let observer = null;
 
 // Load keywords from storage
 chrome.storage.sync.get(['keywords'], (result) => {
-    keywords = result.keywords || {};
+    const raw = result.keywords || {};
+    keywords = raw;
+    keywordMap = new Map();
+    for (const key in raw) {
+        const item = raw[key];
+        keywordMap.set(item.trigger, item);
+    }
 });
 
 // Listen for storage changes
 chrome.storage.onChanged.addListener((changes) => {
-    if (changes.keywords) {
-        keywords = changes.keywords.newValue || {};
+    const raw = changes.keywords.newValue || {};
+    keywords = raw;
+    keywordMap = new Map();
+    for (const key in raw) {
+        const item = raw[key];
+        keywordMap.set(item.trigger, item);
     }
 });
 
@@ -374,76 +385,69 @@ function handleInput(event) {
 
 function processInput(event) {
     const element = event.target;
-    
     if (!isTextInput(element)) return;
-    
+
     // Remove existing popup
     if (currentPopup) {
         hidePopup(currentPopup);
         currentPopup = null;
     }
-    
+
     const wordInfo = getCurrentWord(element);
-    
     if (!wordInfo || wordInfo.word.length < 1) return;
-    
-    // Check for matching keywords
-    const matchingKeywords = Object.values(keywords).filter(k => 
-        k.trigger === wordInfo.word
-    );
-    
-    if (matchingKeywords.length === 0) return;
-    
+
+    // Check for matching keyword using Map
+    if (!keywordMap.has(wordInfo.word)) return;
+    const keyword = keywordMap.get(wordInfo.word);
+
     // Create and show popup
     currentPopup = createPopup();
     currentTarget = element;
-    
-    matchingKeywords.forEach((keyword, index) => {
-        const item = document.createElement('div');
-        item.style.cssText = `
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: ${index < matchingKeywords.length - 1 ? '1px solid #f0f0f0' : 'none'};
-            transition: background-color 0.15s ease;
-            font-size: 14px;
-            line-height: 1.4;
-        `;
-        
-        const preview = htmlToText(keyword.expansion).substring(0, 100);
-        item.innerHTML = `
-            <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
-                ${keyword.trigger}
-            </div>
-            <div style="color: #666; font-size: 12px;">
-                ${preview}${preview.length === 100 ? '...' : ''}
-            </div>
-        `;
-        
-        item.addEventListener('mouseenter', () => {
-            item.style.backgroundColor = '#f8f9fa';
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            item.style.backgroundColor = 'transparent';
-        });
-        
-        item.addEventListener('click', () => {
-            isExpanding = true;
-            expandKeyword(element, keyword.expansion, wordInfo);
-            hidePopup(currentPopup);
-            currentPopup = null;
-            currentTarget = null;
-            
-            setTimeout(() => {
-                isExpanding = false;
-            }, 100);
-        });
-        
-        currentPopup.appendChild(item);
+
+    const item = document.createElement('div');
+    item.style.cssText = `
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: none;
+        transition: background-color 0.15s ease;
+        font-size: 14px;
+        line-height: 1.4;
+    `;
+
+    const preview = htmlToText(keyword.expansion).substring(0, 100);
+    item.innerHTML = `
+        <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
+            ${keyword.trigger}
+        </div>
+        <div style="color: #666; font-size: 12px;">
+            ${preview}${preview.length === 100 ? '...' : ''}
+        </div>
+    `;
+
+    item.addEventListener('mouseenter', () => {
+        item.style.backgroundColor = '#f8f9fa';
     });
-    
+
+    item.addEventListener('mouseleave', () => {
+        item.style.backgroundColor = 'transparent';
+    });
+
+    item.addEventListener('click', () => {
+        isExpanding = true;
+        expandKeyword(element, keyword.expansion, wordInfo);
+        hidePopup(currentPopup);
+        currentPopup = null;
+        currentTarget = null;
+
+        setTimeout(() => {
+            isExpanding = false;
+        }, 100);
+    });
+
+    currentPopup.appendChild(item);
     showPopup(currentPopup);
 }
+
 
 // Handle clicks outside popup
 function handleClickOutside(event) {
