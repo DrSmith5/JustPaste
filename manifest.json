@@ -4,8 +4,7 @@
     "version": "1.0.1",
     "description": "Expand keywords into formatted text snippets",
     "permissions": [
-      "storage",
-      "activeTab"
+      "storage"
     ],
     "content_scripts": [
       {
