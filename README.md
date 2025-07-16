@@ -58,11 +58,10 @@ JustPaste is now installed and ready to use!
 3. Click "yes"
 4. The keyword is now deleted
 
-- > ⚠️ **Note**: You can only save up to **three** keywords with the same trigger word and different paste contents, and keywords **cannot** contain spaces.
+- > ⚠️ **Note**: No duplicate keywords allowed, and keywords **cannot** contain spaces.
 
 ## Coming Soon
 
-- Chrome Web Store release  
 - More features and improvements
 
 ---
