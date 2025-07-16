@@ -219,13 +219,47 @@ function setCursorPosition(element, position) {
 
 // Get current word and position
 function getCurrentWord(element) {
-    const text = getElementText(element);
-    const caretPos = getCursorPosition(element);
+    // For regular inputs and textareas
+    if (element.value !== undefined) {
+        const text = element.value;
+        const cursorPos = element.selectionStart;
+        
+        let start = cursorPos;
+        let end = cursorPos;
+        
+        // Move left to find word start
+        while (start > 0 && !/\s/.test(text[start - 1])) {
+            start--;
+        }
+        
+        // Move right to find word end
+        while (end < text.length && !/\s/.test(text[end])) {
+            end++;
+        }
+        
+        const word = text.substring(start, end);
+        return {
+            word: word.toLowerCase(),
+            start: start,
+            end: end,
+            element: element // Pass the element for replacement
+        };
+    }
     
-    let start = caretPos;
-    let end = caretPos;
+    // For contenteditable elements (your existing code)
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return null;
     
-    // Find word boundaries
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const offset = range.startOffset;
+    
+    if (node.nodeType !== Node.TEXT_NODE) return null;
+    
+    const text = node.textContent;
+    let start = offset;
+    let end = offset;
+    
     while (start > 0 && !/\s/.test(text[start - 1])) {
         start--;
     }
@@ -235,7 +269,12 @@ function getCurrentWord(element) {
     }
     
     const word = text.substring(start, end);
-    return { word: word.toLowerCase(), start, end };
+    return {
+        word: word.toLowerCase(),
+        start: start,
+        end: end,
+        node: node
+    };
 }
 
 // Enhanced HTML to plain text conversion
@@ -243,7 +282,16 @@ function htmlToText(html) {
     const div = document.createElement('div');
     div.innerHTML = html;
     
-    // Convert lists to plain text with proper formatting
+    // Convert block elements to line breaks
+    div.querySelectorAll('div, p, br, h1, h2, h3, h4, h5, h6').forEach(el => {
+        if (el.tagName === 'BR') {
+            el.replaceWith('\n');
+        } else {
+            el.insertAdjacentText('beforebegin', '\n');
+        }
+    });
+    
+    // Handle lists
     div.querySelectorAll('ul').forEach(list => {
         const items = list.querySelectorAll('li');
         let listText = '\n';
@@ -262,110 +310,53 @@ function htmlToText(html) {
         list.replaceWith(document.createTextNode(listText));
     });
     
-    // Convert other elements
-    div.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
-    div.querySelectorAll('p').forEach(p => {
-        p.insertAdjacentText('afterend', '\n');
-    });
-    div.querySelectorAll('div').forEach(div => {
-        div.insertAdjacentText('afterend', '\n');
-    });
-    
-    return (div.textContent || div.innerText || '').replace(/\n\s*\n/g, '\n').trim();
+    return (div.textContent || div.innerText || '')
+        .replace(/\n\s*\n/g, '\n') // Remove extra blank lines
+        .trim();
 }
 
 // Enhanced expansion that works with various input types
 function expandKeyword(element, expansion, wordInfo) {
     try {
-        const plainText = htmlToText(expansion);
-        
-        // For standard inputs
         if (element.value !== undefined) {
+            // Input or textarea - use plain text
+            const plainText = htmlToText(expansion);
             const value = element.value;
             const before = value.substring(0, wordInfo.start);
             const after = value.substring(wordInfo.end);
-            
             element.value = before + plainText + after;
-            
             const newCaretPos = before.length + plainText.length;
             setCursorPosition(element, newCaretPos);
-            
-            // Trigger events
             element.dispatchEvent(new Event('input', { bubbles: true }));
             element.dispatchEvent(new Event('change', { bubbles: true }));
             return;
         }
+
+        // For contenteditable elements - preserve HTML formatting
+        const range = document.createRange();
+        range.setStart(wordInfo.node, wordInfo.start);
+        range.setEnd(wordInfo.node, wordInfo.end);
+        range.deleteContents();
+
+        // Create a temporary div to hold the HTML content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = expansion;
         
-        // For contentEditable elements
+        // Insert each child node from the temp div
+        const fragment = document.createDocumentFragment();
+        while (tempDiv.firstChild) {
+            fragment.appendChild(tempDiv.firstChild);
+        }
+        
+        range.insertNode(fragment);
+        range.collapse(false);
+
         const selection = window.getSelection();
-        if (selection.rangeCount === 0) return;
-        
-        const range = selection.getRangeAt(0);
-        const text = getElementText(element);
-        
-        // Find the text node containing our word
-        const walker = document.createTreeWalker(
-            element,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        
-        let currentPos = 0;
-        let textNode = null;
-        let nodeStartPos = 0;
-        
-        while (walker.nextNode()) {
-            const node = walker.currentNode;
-            const nodeLength = node.textContent.length;
-            
-            if (currentPos + nodeLength >= wordInfo.start) {
-                textNode = node;
-                nodeStartPos = currentPos;
-                break;
-            }
-            currentPos += nodeLength;
-        }
-        
-        if (textNode) {
-            const nodeStart = wordInfo.start - nodeStartPos;
-            const nodeEnd = wordInfo.end - nodeStartPos;
-            
-            // Create range for the word
-            const wordRange = document.createRange();
-            wordRange.setStart(textNode, nodeStart);
-            wordRange.setEnd(textNode, Math.min(nodeEnd, textNode.textContent.length));
-            
-            // Delete the word
-            wordRange.deleteContents();
-            
-            // Insert HTML or plain text based on element capabilities
-            if (element.innerHTML !== undefined) {
-                // Rich text editor - insert HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = expansion;
-                
-                const fragment = document.createDocumentFragment();
-                while (tempDiv.firstChild) {
-                    fragment.appendChild(tempDiv.firstChild);
-                }
-                
-                wordRange.insertNode(fragment);
-            } else {
-                // Plain text editor
-                wordRange.insertNode(document.createTextNode(plainText));
-            }
-            
-            // Position cursor at end
-            wordRange.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(wordRange);
-        }
-        
-        // Trigger events
+        selection.removeAllRanges();
+        selection.addRange(range);
+
         element.dispatchEvent(new Event('input', { bubbles: true }));
         element.dispatchEvent(new Event('change', { bubbles: true }));
-        
     } catch (e) {
         console.warn('Expansion failed:', e);
     }

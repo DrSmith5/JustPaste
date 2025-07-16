@@ -1,5 +1,6 @@
 let editingId = null;
 let keywords = {};
+let triggerToId = {};
 const errorBar = document.getElementById('formErrorBar');
 const errorText = document.getElementById('formErrorText');
 const errorClose = document.getElementById('formErrorClose');
@@ -12,6 +13,13 @@ errorClose.addEventListener('click', () => {
 // Load keywords on startup
 chrome.storage.sync.get(['keywords'], (result) => {
     keywords = result.keywords || {};
+    
+    // BUILD triggerToId lookup
+    triggerToId = {};
+    for (const [id, keyword] of Object.entries(keywords)) {
+        triggerToId[keyword.trigger] = id;
+    }
+
     renderKeywords();
     updateStats();
 });
@@ -100,6 +108,7 @@ function hideForm() {
 }
 
 // Enhanced save function that properly preserves HTML formatting
+// Enhanced save function with proper duplicate error handling
 function saveKeyword() {
     const trigger = document.getElementById('trigger').value.trim();
     const editor = document.getElementById('editor');
@@ -124,41 +133,33 @@ function saveKeyword() {
         return;
     }
 
+    const normalizedTrigger = trigger.toLowerCase();
+    
+    // O(1) duplicate check using triggerToId
+    const existingId = triggerToId[normalizedTrigger];
+    const existingKeyword = existingId && existingId !== editingId ? keywords[existingId] : null;
+
+    if (existingKeyword) {
+        errorText.textContent = `The keyword "${trigger}" already exists. Please choose a different keyword.`;
+        errorBar.classList.remove('hidden');
+        return;
+    }
+
+    // Create/update keyword
     const id = editingId || Date.now().toString();
     const now = Date.now();
-    const existingKeyword = editingId ? keywords[id] : null;
-
-    // Check for duplicate trigger with same content
-    const duplicateKeyword = Object.values(keywords).find(k => 
-        k.id !== id && 
-        k.trigger === trigger.toLowerCase() && 
-        k.expansion === expansion
-    );
-
-    if (duplicateKeyword) {
-        errorText.textContent = 'This keyword already exists with the same content.';
-        errorBar.classList.remove('hidden');
-        return;
-    }
-
-    // Check for too many duplicates
-    const duplicateCount = Object.values(keywords).filter(k => 
-        k.trigger === trigger.toLowerCase()
-    ).length;
-
-    if (duplicateCount >= 3 && !editingId) {
-        errorText.textContent = 'Maximum 3 matching keywords allowed.';
-        errorBar.classList.remove('hidden');
-        return;
-    }
+    const currentKeyword = editingId ? keywords[id] : null;
 
     keywords[id] = {
         id,
-        trigger: trigger.toLowerCase(),
+        trigger: normalizedTrigger,
         expansion,
-        created: existingKeyword ? existingKeyword.created : now,
+        created: currentKeyword ? currentKeyword.created : now,
         updated: now
     };
+
+    // Add to triggerToId
+    triggerToId[normalizedTrigger] = id;
 
     chrome.storage.sync.set({ keywords }, () => {
         renderKeywords();
@@ -241,7 +242,11 @@ function deleteKeyword(id) {
     keywordEl.appendChild(confirmBar);
 
     confirmBar.querySelector('.btn-confirm').addEventListener('click', () => {
+        const keyword = keywords[id];
+
         delete keywords[id];
+        delete triggerToId[keyword.trigger];
+        
         chrome.storage.sync.set({ keywords }, () => {
             renderKeywords();
             updateStats();
