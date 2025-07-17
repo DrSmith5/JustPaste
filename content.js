@@ -459,6 +459,31 @@ function handleKeyDown(event) {
         currentPopup = null;
         currentTarget = null;
     }
+
+    // Handle backtick (`) key for quick expansion
+    if (event.key === '`' && currentPopup && currentTarget) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Get the current word info again to ensure we have the right data
+        const wordInfo = getCurrentWord(currentTarget);
+        if (!wordInfo || !keywordMap.has(wordInfo.word)) return;
+        
+        const keyword = keywordMap.get(wordInfo.word);
+        
+        // Expand the keyword
+        isExpanding = true;
+        expandKeyword(currentTarget, keyword.expansion, wordInfo);
+        
+        // Hide popup
+        hidePopup(currentPopup);
+        currentPopup = null;
+        currentTarget = null;
+        
+        setTimeout(() => {
+            isExpanding = false;
+        }, 100);
+    }
 }
 
 // Set up mutation observer for dynamic content
