@@ -18,16 +18,18 @@ chrome.storage.local.get(['keywords'], (result) => {
 });
 
 // Listen for storage changes
-chrome.storage.onChanged.addListener((changes) => {
-    if (namespace !== 'local') return; // only check for local changes
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.keywords) {
     const raw = changes.keywords.newValue || {};
     keywords = raw;
     keywordMap = new Map();
     for (const key in raw) {
-        const item = raw[key];
-        keywordMap.set(item.trigger, item);
+      const item = raw[key];
+      keywordMap.set(item.trigger, item);
     }
+  }
 });
+
 
 // Enhanced element detection for various input types
 function isTextInput(element) {
