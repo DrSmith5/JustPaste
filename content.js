@@ -7,7 +7,7 @@ let isExpanding = false;
 let observer = null;
 
 // Load keywords from storage
-chrome.storage.sync.get(['keywords'], (result) => {
+chrome.storage.local.get(['keywords'], (result) => {
     const raw = result.keywords || {};
     keywords = raw;
     keywordMap = new Map();
@@ -19,6 +19,7 @@ chrome.storage.sync.get(['keywords'], (result) => {
 
 // Listen for storage changes
 chrome.storage.onChanged.addListener((changes) => {
+    if (namespace !== 'local') return; // only check for local changes
     const raw = changes.keywords.newValue || {};
     keywords = raw;
     keywordMap = new Map();

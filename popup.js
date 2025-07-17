@@ -11,7 +11,7 @@ errorClose.addEventListener('click', () => {
 
 
 // Load keywords on startup
-chrome.storage.sync.get(['keywords'], (result) => {
+chrome.storage.local.get(['keywords'], (result) => {
     keywords = result.keywords || {};
     
     // BUILD triggerToId lookup
@@ -161,7 +161,7 @@ function saveKeyword() {
     // Add to triggerToId
     triggerToId[normalizedTrigger] = id;
 
-    chrome.storage.sync.set({ keywords }, () => {
+    chrome.storage.local.set({ keywords }, () => {
         renderKeywords();
         updateStats();
         hideForm();
@@ -247,7 +247,7 @@ function deleteKeyword(id) {
         delete keywords[id];
         delete triggerToId[keyword.trigger];
         
-        chrome.storage.sync.set({ keywords }, () => {
+        chrome.storage.local.set({ keywords }, () => {
             renderKeywords();
             updateStats();
         });
