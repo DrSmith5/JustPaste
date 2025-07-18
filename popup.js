@@ -334,3 +334,9 @@ function updateStats() {
     const count = Object.keys(keywords).length;
     document.getElementById('stats').textContent = `${count} keyword${count !== 1 ? 's' : ''} saved`;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const versionElem = document.getElementById('version');
+  const manifestData = chrome.runtime.getManifest();
+  versionElem.textContent = `v${manifestData.version}`;
+});
