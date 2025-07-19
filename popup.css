@@ -1,24 +1,122 @@
+/* CSS Custom Properties for consistent theming */
+:root {
+    --primary-color: #667eea;
+    --primary-dark: #5a6fd8;
+    --secondary-color: #764ba2;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #f8d7da;
+    --warning-text: #721c24;
+    --warning-border: #f5c6cb;
+    
+    /* Light theme colors */
+    --bg-color: #ffffff;
+    --text-color: #333;
+    --border-color: #dee2e6;
+    --muted-text: #6c757d;
+    --light-bg: #f8f9fa;
+    --input-bg: #ffffff;
+    --shadow-color: rgba(0,0,0,0.05);
+    
+    /* Scrollbar colors */
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
+}
+
+/* Dark theme colors */
+body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #f1f1f1;
+    --border-color: #444;
+    --muted-text: #ccc;
+    --light-bg: #2c2c2c;
+    --input-bg: #1a1a1a;
+    --shadow-color: rgba(0,0,0,0.3);
+    
+    /* Dark scrollbar colors */
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #555;
+    --scrollbar-thumb-hover: #777;
+}
+
+/* Base Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base Body Styles */
 body {
     width: 400px;
     min-height: 500px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #333;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+body.dark-mode {
+    background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
+}
+
+/* Unified Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Unified Animation Keyframes */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-5px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Header Styles */
 .header {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     padding: 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .header {
+    background: var(--light-bg);
+    color: var(--text-color);
 }
 
 .header h1 {
@@ -33,15 +131,61 @@ body {
     font-size: 14px;
 }
 
-.container {
-    padding: 20px;
-    background: white;
-    margin: 0;
-    min-height: calc(500px - 80px);
+body.dark-mode .header h1,
+body.dark-mode .header p {
+    color: var(--text-color);
 }
 
+/* Container Styles */
+.container {
+    padding: 20px;
+    background: var(--bg-color);
+    margin: 0;
+    min-height: calc(500px - 80px);
+    transition: background-color 0.3s ease;
+}
+
+/* Unified Input/Textarea/Editor Styles */
+input,
+textarea,
+.editor,
+.search-box {
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+.editor:focus,
+.search-box:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Unified Button Hover Effects */
+.add-keyword,
+.btn-primary,
+.keyword-item {
+    transition: all 0.3s ease;
+}
+
+.add-keyword:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.keyword-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+/* Button Styles */
 .add-keyword {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
     padding: 12px 20px;
@@ -51,38 +195,27 @@ body {
     font-weight: 500;
     width: 100%;
     margin-bottom: 20px;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .add-keyword:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
+/* Form Styles */
 .keyword-form {
     display: none;
-    background: #f8f9fa;
+    background: var(--light-bg);
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 20px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border-color);
     animation: slideDown 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .keyword-form.show {
     display: block;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .form-group {
@@ -93,31 +226,24 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-    color: #495057;
+    color: var(--text-color);
     font-size: 14px;
 }
 
 .form-group input {
     width: 100%;
     padding: 10px;
-    border: 2px solid #dee2e6;
     border-radius: 6px;
     font-size: 14px;
-    transition: border-color 0.3s ease;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
+/* Confirmation Dialog */
 .confirm-delete {
     margin-top: 10px;
     padding: 10px;
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: var(--warning-color);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
     border-radius: 6px;
     display: flex;
     justify-content: space-between;
@@ -147,39 +273,38 @@ body {
 }
 
 .confirm-delete .btn-confirm {
-    background-color: #dc3545;
+    background-color: var(--danger-color);
     color: white;
 }
 
 .confirm-delete .btn-cancel {
-    background-color: #6c757d;
+    background-color: var(--muted-text);
     color: white;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
+/* Editor Styles */
 .editor-container {
-    border: 2px solid #dee2e6;
     border-radius: 6px;
     overflow: hidden;
+    background: var(--input-bg);
+    border: 2px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .editor-toolbar {
-    background: #f8f9fa;
+    background: var(--light-bg);
     padding: 10px;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
+    transition: background-color 0.3s ease;
 }
 
 .editor-btn {
-    background: white;
-    border: 1px solid #dee2e6;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
     padding: 6px 10px;
     border-radius: 4px;
     cursor: pointer;
@@ -188,13 +313,13 @@ body {
 }
 
 .editor-btn:hover {
-    background: #e9ecef;
+    background: var(--light-bg);
 }
 
 .editor-btn.active {
-    background: #667eea;
+    background: var(--primary-color);
     color: white;
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 .editor {
@@ -207,66 +332,43 @@ body {
     font-size: 14px;
     line-height: 1.5;
     resize: vertical;
-
-    /* Enable horizontal AND vertical scrolling */
     overflow-x: auto;
     overflow-y: auto;
-
-    /* Keep content on one line unless manually broken */
     white-space: pre;
-
-    /* Ensure box uses padding in its size */
     width: 100%;
     box-sizing: border-box;
 }
-
 
 .editor:empty:before {
     content: attr(data-placeholder);
     color: #adb5bd;
 }
 
-/* Fix list indentation and spacing */
+body.dark-mode .editor:empty:before {
+    color: #666;
+}
+
+/* List Styles in Editor */
 .editor ul, .editor ol {
     margin: 8px 0;
-    padding-left: 24px; /* Proper bullet indentation */
+    padding-left: 24px;
 }
 
 .editor li {
     margin: 4px 0;
-    padding-left: 4px; /* Small additional space after bullet */
+    padding-left: 4px;
 }
 
-/* Nested lists */
 .editor ul ul, .editor ol ol, .editor ul ol, .editor ol ul {
     margin: 4px 0;
     padding-left: 20px;
 }
 
-/* Prevent content from getting too close to container edge */
 .editor p {
     margin: 4px 0;
 }
 
-/* Scrollbar styling for better UX */
-.editor::-webkit-scrollbar {
-    width: 6px;
-}
-
-.editor::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.editor::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.editor::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
+/* Form Actions */
 .form-actions {
     display: flex;
     gap: 10px;
@@ -285,17 +387,16 @@ body {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: var(--primary-color);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5a6fd8;
-    transform: translateY(-1px);
+    background: var(--primary-dark);
 }
 
 .btn-secondary {
-    background: #6c757d;
+    background: var(--muted-text);
     color: white;
 }
 
@@ -303,26 +404,24 @@ body {
     background: #5a6268;
 }
 
+/* Keywords List */
 .keywords-list {
-    max-height: 300px;
+    max-height: 285px;
     overflow-y: auto;
+    background: var(--bg-color);
+    transition: background-color 0.3s ease;
 }
 
 .keyword-item {
-    background: white;
-    border: 1px solid #e9ecef;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 10px;
-    transition: all 0.3s ease;
     position: relative;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.keyword-item:hover {
-    border-color: #667eea;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px var(--shadow-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
 }
 
 .keyword-header {
@@ -334,7 +433,7 @@ body {
 
 .keyword-trigger {
     font-weight: 600;
-    color: #667eea;
+    color: var(--primary-color);
     font-size: 16px;
 }
 
@@ -354,30 +453,31 @@ body {
 }
 
 .action-btn:hover {
-    background: #f8f9fa;
+    background: var(--light-bg);
 }
 
 .action-btn.edit {
-    color: #28a745;
+    color: var(--success-color);
 }
 
 .action-btn.delete {
-    color: #dc3545;
+    color: var(--danger-color);
 }
 
 .keyword-preview {
     font-size: 13px;
-    color: #6c757d;
+    color: var(--muted-text);
     line-height: 1.4;
     max-height: 60px;
     overflow: hidden;
     position: relative;
 }
 
+/* Empty State */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
-    color: #6c757d;
+    color: var(--muted-text);
 }
 
 .empty-state img {
@@ -387,20 +487,13 @@ body {
     opacity: 0.5;
 }
 
+/* Search Box */
 .search-box {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e9ecef;
     border-radius: 8px;
     font-size: 14px;
     margin-bottom: 20px;
-    transition: border-color 0.3s ease;
-}
-
-.search-box:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-box::placeholder {
@@ -411,40 +504,138 @@ body {
     display: none;
 }
 
+/* Stats */
 .stats {
     background: rgba(102, 126, 234, 0.1);
     padding: 10px 15px;
     border-radius: 8px;
     margin-bottom: 20px;
     font-size: 13px;
-    color: #495057;
+    color: var(--text-color);
     text-align: center;
 }
 
+/* Error Bar */
 .form-error-bar {
-  background-color: #ff4d4f;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  animation: fadeIn 0.2s ease-in-out;
+    background-color: #ff4d4f;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.2s ease-in-out;
 }
 
 .form-error-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  padding: 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
 }
 
+/* Utility Classes */
 .hidden {
-  display: none;
+    display: none;
+}
+
+/* Settings */
+#settingsButton {
+    position: fixed;
+    top: 10px;
+    right: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 103;
+}
+
+#settingsOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 100;
+}
+
+#settingsOverlay.visible {
+    display: block;
+}
+
+#settingsPanel {
+    position: fixed;
+    top: 0;
+    right: -260px;
+    width: 250px;
+    height: 100%;
+    background: var(--light-bg);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    transition: right 0.3s ease, background-color 0.3s ease;
+    z-index: 102;
+    color: var(--text-color);
+}
+
+#settingsPanel.open {
+    right: 0;
+}
+
+/* Toggle Controls */
+.toggleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bbb;
+    border-radius: 22px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+    background-color: #4caf50;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
 }

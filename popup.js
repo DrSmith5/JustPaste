@@ -303,7 +303,7 @@ function renderKeywords(searchQuery = '') {
         .map(keyword => {
             const preview = keyword.expansion.replace(/<[^>]*>/g, '').substring(0, 100);
             return `
-                <div class="keyword-item">
+                <div class="keyword-item dark-compatible">
                     <div class="keyword-header">
                         <span class="keyword-trigger">${keyword.trigger}</span>
                         <div class="keyword-actions">
@@ -340,3 +340,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const manifestData = chrome.runtime.getManifest();
   versionElem.textContent = `v${manifestData.version}`;
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const settingsBtn = document.getElementById('settingsButton');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const toggle = document.getElementById('darkModeToggle');
+
+  // Load saved theme
+  const isDark = localStorage.getItem('darkMode') === 'true';
+  document.body.classList.toggle('dark-mode', isDark);
+  toggle.checked = isDark;
+
+  // Toggle panel + overlay
+  function toggleSettings() {
+    const isOpen = settingsPanel.classList.contains('open');
+    settingsPanel.classList.toggle('open', !isOpen);
+    settingsOverlay.classList.toggle('visible', !isOpen);
+  }
+
+  settingsBtn.addEventListener('click', toggleSettings);
+  settingsOverlay.addEventListener('click', toggleSettings);
+
+  // Toggle dark mode
+  toggle.addEventListener('change', () => {
+    const enabled = toggle.checked;
+    document.body.classList.toggle('dark-mode', enabled);
+    localStorage.setItem('darkMode', enabled);
+  });
+});
+
+
