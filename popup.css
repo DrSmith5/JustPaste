@@ -143,6 +143,7 @@ body.dark-mode .header p {
     margin: 0;
     min-height: calc(500px - 80px);
     transition: background-color 0.3s ease;
+    max-height: 505px;
 }
 
 /* Unified Input/Textarea/Editor Styles */
@@ -410,6 +411,12 @@ body.dark-mode .editor:empty:before {
     overflow-y: auto;
     background: var(--bg-color);
     transition: background-color 0.3s ease;
+}
+
+/* When form is shown, hide keywords list and search box */
+.keyword-form.show ~ .search-box,
+.keyword-form.show ~ .keywords-list {
+    display: none;
 }
 
 .keyword-item {
