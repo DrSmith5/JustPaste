@@ -74,6 +74,7 @@ document.getElementById('searchBox').addEventListener('input', (e) => {
 function showForm(keyword = null) {
     const form = document.getElementById('keywordForm');
     const addBtn = document.getElementById('addBtn');
+    document.body.style.overflow = 'auto';
     
     form.classList.add('show');
     addBtn.textContent = keyword ? 'Cancel Edit' : 'Cancel';
@@ -101,6 +102,9 @@ function showForm(keyword = null) {
 function hideForm() {
     const form = document.getElementById('keywordForm');
     const addBtn = document.getElementById('addBtn');
+    document.body.style.overflow = 'hidden';
+
+    errorBar.classList.add('hidden');
     
     form.classList.remove('show');
     addBtn.textContent = '+ Add New Keyword';
@@ -128,8 +132,7 @@ function saveKeyword() {
     if (!trigger || !expansion) return;
 
     if (trigger.includes(' ')) {
-        errorText.textContent = 'Spaces are not allowed in the keyword.';
-        errorBar.classList.remove('hidden');
+        showErrorWithFade('Spaces are not allowed in the keyword.');
         return;
     }
 
@@ -140,8 +143,7 @@ function saveKeyword() {
     const existingKeyword = existingId && existingId !== editingId ? keywords[existingId] : null;
 
     if (existingKeyword) {
-        errorText.textContent = `The keyword "${trigger}" already exists. Please choose a different keyword.`;
-        errorBar.classList.remove('hidden');
+        showErrorWithFade(`The keyword "${trigger}" already exists.`);
         return;
     }
 
@@ -370,4 +372,58 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Add expand button functionality
+document.getElementById('expandBtn').addEventListener('click', () => {
+    const editor = document.getElementById('editor');
+    const editorContainer = document.getElementById('editor').closest('.editor-container');
+    const expandBtn = document.getElementById('expandBtn');
+    
+    if (editor.classList.contains('expanded')) {
+        // Collapse
+        editor.classList.remove('expanded');
+        editorContainer.style.position = '';
+        editorContainer.style.top = '';
+        editorContainer.style.left = '';
+        editorContainer.style.width = '';
+        editorContainer.style.height = '';
+        editorContainer.style.zIndex = '';
+        editorContainer.style.boxShadow = '';
+        editor.style.height = '';
+        editor.style.minHeight = '';
+        editor.style.maxHeight = '';
+        expandBtn.innerHTML = '⤢';
+        expandBtn.title = 'Expand editor';
+    } else {
+        // Expand - move the entire editor container
+        editor.classList.add('expanded');
+        editorContainer.style.position = 'fixed';
+        editorContainer.style.top = '20px';
+        editorContainer.style.left = '20px';
+        editorContainer.style.width = 'calc(100vw - 40px)';
+        editorContainer.style.height = 'calc(100vh - 40px)';
+        editorContainer.style.zIndex = '9999';
+        editorContainer.style.boxShadow = '0 20px 50px rgba(0,0,0,0.5)';
+        editor.style.height = 'calc(100vh - 100px)';
+        editor.style.minHeight = 'calc(100vh - 100px)';
+        editor.style.maxHeight = 'calc(100vh - 100px)';
+        expandBtn.innerHTML = '⤡';
+        expandBtn.title = 'Collapse editor';
+    }
+});
+
+function showErrorWithFade(message) {
+    errorText.textContent = message;
+    errorBar.classList.remove('hidden');
+    errorBar.classList.remove('fade-out'); // Make sure it's visible
+    
+    setTimeout(() => {
+        errorBar.classList.add('fade-out'); // Start fade
+        
+        // Hide completely after fade finishes
+        setTimeout(() => {
+            errorBar.classList.add('hidden');
+            errorBar.classList.remove('fade-out'); // Reset for next time
+        }, 300); // 300ms matches the CSS transition
+    }, 2700); // Start fade at 2.7s (total 3s)
+}
 

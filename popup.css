@@ -149,6 +149,8 @@ body.dark-mode .header p {
     margin: 0;
     min-height: 100%;
     transition: background-color 0.3s ease;
+    position: relative;
+    overflow: visible;
 }
 
 /* Unified Input/Textarea/Editor Styles */
@@ -210,6 +212,7 @@ textarea:focus,
 
 /* Form Styles */
 .keyword-form {
+    position: relative;
     display: none;
     background: var(--light-bg);
     padding: 20px;
@@ -305,6 +308,33 @@ textarea:focus,
     gap: 5px;
     flex-wrap: wrap;
     transition: background-color 0.3s ease;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.expand-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    position: relative;
+    z-index: 10000;
+}
+
+/* Keep toolbar visible in expanded mode */
+.editor.expanded + .editor-container .editor-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10001;
+}
+
+.expand-btn:hover {
+    background: rgba(128, 128, 128, 0.2);
 }
 
 .editor-btn {
@@ -530,6 +560,12 @@ body.dark-mode .editor:empty:before {
 
 /* Error Bar */
 .form-error-bar {
+    position: absolute;
+    top: 120px;
+    left: 20px;
+    right: 20px;
+    z-index: 1000;
+    margin: 0;
     background-color: #ff4d4f;
     color: white;
     padding: 8px 12px;
@@ -540,6 +576,11 @@ body.dark-mode .editor:empty:before {
     justify-content: space-between;
     align-items: center;
     animation: fadeIn 0.2s ease-in-out;
+    transition: opacity 0.3s ease;
+}
+
+.form-error-bar.fade-out {
+    opacity: 0;
 }
 
 .form-error-close {
